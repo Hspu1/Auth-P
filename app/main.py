@@ -45,11 +45,12 @@ def create_app(testing: bool = False) -> FastAPI:
         app.state.testing = True
 
     static_docs_urls(app=app)
+    # auth1 - google oauth (for credentials)
+
     return app
 
 
 app = create_app()
-
 
 if __name__ == "__main__":
     run(
