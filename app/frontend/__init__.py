@@ -1,4 +1,4 @@
-__all__ = "homepage_rout"
+__all__ = "homepage_router"
 
 
-from .homepage import homepage_rout
+from .homepage import homepage_router

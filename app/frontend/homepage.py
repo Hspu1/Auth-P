@@ -1,23 +1,28 @@
-from starlette.responses import HTMLResponse, RedirectResponse
+from starlette.responses import HTMLResponse
 from fastapi import APIRouter, Request
 
-homepage_rout = APIRouter(tags=["frontend"])
+homepage_router = APIRouter(tags=["frontend"])
 
 
-@homepage_rout.get("/", response_class=HTMLResponse, status_code=200)
-def html_landing(request: Request) -> HTMLResponse:
+@homepage_router.get("/", response_class=HTMLResponse, status_code=200)
+async def html_landing(request: Request) -> HTMLResponse:
     user = request.session.get("user")
+    msg = request.query_params.get("msg")
+
+    error_html = ""
+    if msg == "access_denied":
+        error_html = '<div class="error-msg">Access denied by user</div>'
 
     if user:
         first_name = user.get("given_name", "User")
         content = f"""
             <div class="glow-text">Welcome, {first_name}</div>
-            <a href="/logout" class="login-btn">Log out</a>
+            <a href="/auth/google/logout" class="login-btn">Log out</a>
         """
     else:
         content = """
             <div class="glow-text">Auth-P</div>
-            <a href="/login" class="login-btn">Log in via Google</a>
+            <a href="/auth/google/login" class="login-btn">Log in via Google</a>
         """
 
     return HTMLResponse(content=f"""
@@ -32,7 +37,12 @@ def html_landing(request: Request) -> HTMLResponse:
                 display: flex; align-items: center; justify-content: center;
                 background-color: #121212; font-family: sans-serif; overflow: hidden;
             }}
-            .center-container {{ text-align: center; }}
+            .center-container {{ 
+                text-align: center; 
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }}
             .glow-text {{
                 font-size: 64px; font-weight: bold; color: #32d69f;
                 text-shadow: 0 0 10px rgba(50, 214, 159, 0.5), 0 0 20px rgba(50, 214, 159, 0.3);
@@ -50,18 +60,28 @@ def html_landing(request: Request) -> HTMLResponse:
                 border-color: rgba(255, 255, 255, 0.8);
                 color: #32d69f;
             }}
+            .error-msg {{
+                color: #ff4c4c;
+                background: rgba(255, 76, 76, 0.1);
+                border: 1px solid #ff4c4c;
+                padding: 10px 20px;
+                border-radius: 4px;
+                margin-bottom: 30px;
+                font-size: 16px;
+                font-weight: bold;
+                animation: fade-in 0.3s ease-out;
+            }}
+            @keyframes fade-in {{
+                from {{ opacity: 0; transform: translateY(-10px); }}
+                to {{ opacity: 1; transform: translateY(0); }}
+            }}
         </style>
     </head>
     <body>
         <div class="center-container">
+            {error_html}
             {content}
         </div>
     </body>
     </html>
     """)
-
-
-@homepage_rout.get("/logout")
-def logout(request: Request) -> RedirectResponse:
-    request.session.clear()
-    return RedirectResponse(url="/")
