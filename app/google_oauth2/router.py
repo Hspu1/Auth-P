@@ -28,6 +28,7 @@ async def auth_google_login(request: Request):
 @google_oauth2_router.get(path="/callback")
 async def auth_google_callback(request: Request) -> RedirectResponse:
     if request.query_params.get("error"):
+        request.session.clear()
         return RedirectResponse(url="/?msg=access_denied")
 
     try:
