@@ -4,14 +4,14 @@ from fastapi import APIRouter, Request
 homepage_rout = APIRouter(tags=["frontend"])
 
 
-@homepage_rout.get("/", response_class=HTMLResponse)
-def html_landing(request: Request):
+@homepage_rout.get("/", response_class=HTMLResponse, status_code=200)
+def html_landing(request: Request) -> HTMLResponse:
     user = request.session.get("user")
 
     if user:
         first_name = user.get("given_name", "User")
         content = f"""
-            <div class="glow-text">Wellcum, {first_name}</div>
+            <div class="glow-text">Welcome, {first_name}</div>
             <a href="/logout" class="login-btn">Log out</a>
         """
     else:
@@ -20,7 +20,7 @@ def html_landing(request: Request):
             <a href="/login" class="login-btn">Log in via Google</a>
         """
 
-    return f"""
+    return HTMLResponse(content=f"""
     <!DOCTYPE html>
     <html lang="ru">
     <head>
@@ -58,10 +58,10 @@ def html_landing(request: Request):
         </div>
     </body>
     </html>
-    """
+    """)
 
 
 @homepage_rout.get("/logout")
-def logout(request: Request):
+def logout(request: Request) -> RedirectResponse:
     request.session.clear()
     return RedirectResponse(url="/")

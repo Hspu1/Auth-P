@@ -21,7 +21,7 @@ oauth.register(
 
 
 @google_oauth2.get(path="/auth1")
-async def auth1(request: Request):
+async def auth1(request: Request) -> RedirectResponse:
     if request.query_params.get("error"):
         return RedirectResponse(url="/")
 
@@ -39,6 +39,6 @@ async def auth1(request: Request):
 
 
 @google_oauth2.get(path="/login")
-async def login(request: Request):
+async def login(request: Request) -> RedirectResponse:
     redirect_uri = request.url_for('auth1')
     return await oauth.google.authorize_redirect(request, redirect_uri)
