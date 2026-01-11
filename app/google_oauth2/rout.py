@@ -23,7 +23,7 @@ oauth.register(
 @google_oauth2.get(path="/auth1")
 async def auth1(request: Request):
     if request.query_params.get("error"):
-        return RedirectResponse(url="/???")
+        return RedirectResponse(url="/")
 
     try:
         token = await oauth.google.authorize_access_token(request)
@@ -35,7 +35,7 @@ async def auth1(request: Request):
         raise HTTPException(status_code=400, detail="Failed to fetch user info")
 
     request.session['user'] = dict(user_info)
-    return RedirectResponse(url='/???')
+    return RedirectResponse(url='/')
 
 
 @google_oauth2.get(path="/login")
