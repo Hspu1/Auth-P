@@ -6,6 +6,10 @@ from fastapi.openapi.docs import (
     get_swagger_ui_oauth2_redirect_html,
 )
 from uvicorn import run
+from starlette.middleware.sessions import SessionMiddleware
+
+from app.frontend.homepage import homepage_rout
+from app.google_oauth2 import google_oauth2
 
 
 def static_docs_urls(app: FastAPI):
@@ -45,7 +49,10 @@ def create_app(testing: bool = False) -> FastAPI:
         app.state.testing = True
 
     static_docs_urls(app=app)
-    # auth1 - google oauth (for credentials)
+
+    app.add_middleware(SessionMiddleware, secret_key="SECRET_KEY")
+    app.include_router(google_oauth2)
+    app.include_router(homepage_rout)
 
     return app
 
