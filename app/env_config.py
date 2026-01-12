@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     client_id: str
     client_secret: str
     session_secret_key: str
+    db_url: str
 
 
 stg = Settings()

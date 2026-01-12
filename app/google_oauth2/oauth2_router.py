@@ -2,7 +2,7 @@ from authlib.integrations.starlette_client import OAuth, OAuthError
 from fastapi import APIRouter, Request, HTTPException
 from starlette.responses import RedirectResponse
 
-from app.config import stg
+from app.env_config import stg
 
 
 google_oauth2_router = APIRouter(tags=["google_oauth2"], prefix="/auth/google")

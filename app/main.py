@@ -10,7 +10,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from app.frontend.homepage import homepage_router
 from app.google_oauth2 import google_oauth2_router
-from app.config import stg
+from app.env_config import stg
 
 
 def static_docs_urls(app: FastAPI):
