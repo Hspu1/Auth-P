@@ -6,6 +6,7 @@ homepage_router = APIRouter(tags=["frontend"])
 
 @homepage_router.get("/", response_class=HTMLResponse, status_code=200)
 async def html_landing(request: Request) -> HTMLResponse:
+    # юзай джинджу
     user = request.session.get("user")
     msg = request.query_params.get("msg")
 
@@ -14,9 +15,9 @@ async def html_landing(request: Request) -> HTMLResponse:
         error_html = '<div class="error-msg">Access denied by user</div>'
 
     if user:
-        first_name = user.get("given_name", "User")
+        full_name = user.get("name")
         content = f"""
-            <div class="glow-text">Welcome, {first_name}</div>
+            <div class="glow-text">Welcome, {full_name}</div>
             <a href="/auth/google/logout" class="login-btn">Log out</a>
         """
     else:

@@ -34,11 +34,16 @@ async def auth_google_callback(request: Request) -> RedirectResponse:
     try:
         token = await oauth.google.authorize_access_token(request)
         user_info = token.get("userinfo")
+        print(user_info)
         if user_info:
+            # передавай только id (UUID v7) из базы
             request.session['user'] = {
-                "given_name": user_info.get("given_name"),
+                "name": user_info.get("name"),
                 "picture": user_info.get("picture"),
-                "email": user_info.get("email")
+
+                "email": user_info.get("email"),
+                "email_verified": user_info.get("email_verified"),
+                "sub": user_info.get("sub"),
             }
         return RedirectResponse(url='/')
 
