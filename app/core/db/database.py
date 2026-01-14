@@ -1,9 +1,9 @@
 from sqlalchemy.ext.asyncio import (
     create_async_engine, async_sessionmaker, AsyncSession
 )
-from sqlalchemy.orm import DeclarativeBase
 
 from app.env_config import stg
+# wb DI (Dishka??)
 
 engine = create_async_engine(
     stg.db_url, pool_pre_ping=True,  # auto health check
@@ -17,10 +17,7 @@ async_session_maker = async_sessionmaker(
 )
 
 
-class Base(DeclarativeBase):
-    pass
-
-
 async def get_db():
+    # wb try-except (everywhere??)
     async with async_session_maker() as session:
         yield session
