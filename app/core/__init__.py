@@ -1,3 +1,3 @@
-__all__ = ("Base", "get_db")
+__all__ = ("Base", "get_db", "UsersModel", "UserIdentitiesModel")
 
-from .db import Base, get_db
+from .db import Base, get_db, UsersModel, UserIdentitiesModel
