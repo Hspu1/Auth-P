@@ -9,7 +9,7 @@ from uvicorn import run
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.frontend.homepage import homepage_router
-from app.google_oauth2 import google_oauth2_router
+from app.api.auth.google_oauth2 import google_oauth2_router
 from app.env_config import stg
 
 

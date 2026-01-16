@@ -6,7 +6,7 @@ homepage_router = APIRouter(tags=["frontend"])
 
 @homepage_router.get("/", response_class=HTMLResponse, status_code=200)
 async def html_landing(request: Request) -> HTMLResponse:
-    # юзай джинджу
+    # юзай джинджу - на сейве готовые, только fu/cu. делай нормально
     user = request.session.get("user")
     msg = request.query_params.get("msg")
 
