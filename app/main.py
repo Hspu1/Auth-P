@@ -51,6 +51,7 @@ def create_app(testing: bool = False) -> FastAPI:
         app.state.testing = True
 
     static_docs_urls(app=app)
+    # wb FastAPI CSRF Protect and stuff
 
     app.add_middleware(SessionMiddleware, secret_key=stg.session_secret_key)
     app.include_router(google_oauth2_router)

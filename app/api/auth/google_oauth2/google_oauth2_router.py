@@ -40,7 +40,6 @@ async def auth_google_callback(request: Request) -> RedirectResponse:
             request.session['user'] = {
                 "name": user_info.get("name"),
                 "picture": user_info.get("picture"),
-
                 "email": user_info.get("email"),
                 "email_verified": user_info.get("email_verified"),
                 "sub": user_info.get("sub"),
