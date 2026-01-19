@@ -1,8 +1,8 @@
 """initial commit: added users and user_identities tables
 
-Revision ID: dbc3547f9d50
+Revision ID: 96cd56508ab7
 Revises: 
-Create Date: 2026-01-16 23:15:22.134641
+Create Date: 2026-01-19 17:59:11.149804
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'dbc3547f9d50'
+revision: str = '96cd56508ab7'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -38,7 +38,7 @@ def upgrade() -> None:
             sa.Column('id', sa.Uuid(), nullable=False),
             sa.Column('user_id', sa.Uuid(), nullable=False),
             sa.Column('provider', sa.String(length=50), nullable=False),
-            sa.Column('provider_user_id', sa.String(length=255), nullable=False),
+            sa.Column('provider_user_id', sa.String(length=255), nullable=True),
             sa.Column('password_hash', sa.String(length=1024), nullable=True),
             sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
             sa.PrimaryKeyConstraint('id'),

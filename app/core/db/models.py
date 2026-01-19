@@ -29,7 +29,7 @@ class UserIdentitiesModel(Base, UUIDv7Mixin):
 
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     provider: Mapped[str] = mapped_column(String(50), nullable=False)
-    provider_user_id: Mapped[str] = mapped_column(String(255), nullable=False)
+    provider_user_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
     password_hash: Mapped[str | None] = mapped_column(String(1024), nullable=True)
     user: Mapped["UsersModel"] = relationship("UsersModel", back_populates="identities")
 
