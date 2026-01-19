@@ -61,6 +61,7 @@ async def callback_handling(request: Request) -> RedirectResponse:
         user_info = token.get("userinfo")
         if user_info:
             request.session['user_id'] = await get_user_id(user_info=user_info)
+            request.session['full_name'] = user_info["name"]
         return RedirectResponse(url='/')
 
     except OAuthError as e:
