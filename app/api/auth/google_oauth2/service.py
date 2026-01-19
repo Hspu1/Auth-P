@@ -38,7 +38,7 @@ async def get_user_id(user_info: dict):
                     email_verification_at=email_verification
                 )
                 session.add(user)
-                await session.flush()
+                await session.flush()  # перестраховка - отправляем изменения как в коммите, но не завершаем транзакцию
             else:
                 if not user.email_verification_at and email_verification:
                     user.email_verification_at = email_verification

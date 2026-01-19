@@ -19,23 +19,18 @@ class UsersModel(Base, TimestampMixin, UUIDv7Mixin):
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, server_default="true")  # ban etc
     identities: Mapped[list["UserIdentitiesModel"]] = relationship("UserIdentitiesModel", back_populates="user", cascade="all, delete-orphan")
 
-    __table_args__ = (
-        Index('idx_users_active_created', 'is_active', 'created_at'),
-    )
+    __table_args__ = (Index("idx_users_full_name", "full_name"),)
+    # wb CheckConstraint
 
 
-class UserIdentitiesModel(Base, UUIDv7Mixin):
+class UserIdentitiesModel(Base):
     __tablename__ = "user_identities"
 
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    provider: Mapped[str] = mapped_column(String(50), nullable=False)
-    provider_user_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    provider: Mapped[str] = mapped_column(String(50), nullable=False, primary_key=True)
+    provider_user_id: Mapped[str] = mapped_column(String(255), nullable=False, primary_key=True)
     # provider_user_id - sub/email/nickname/number etc
     password_hash: Mapped[str | None] = mapped_column(String(1024), nullable=True)
     user: Mapped["UsersModel"] = relationship("UsersModel", back_populates="identities")
 
-    __table_args__ = (
-        UniqueConstraint('provider', 'provider_user_id', name='uq_identities_provider_user'),
-        Index('idx_identities_provider_lookup', 'provider', 'provider_user_id'),
-        Index('idx_identities_user_id', 'user_id'),
-    )
+    __table_args__ = (Index('idx_identities_user_id', 'user_id'),)
