@@ -6,23 +6,28 @@
     <title>{% block title %}Auth-P{% endblock %}</title>
     <script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js"></script>
     <style>
-        :root {
-    --bg-dark: #121212;
-    --neon-green: #32d69f;
-    --accent-hover: #1a1a1a;
-    --error-red: #ff4c4c;
-}
+    :root {
+        --bg-dark: #121212;
+        --neon-green: #32d69f;
+        --neon-green-alpha: rgba(50, 214, 159, 0.5);
+        --neon-green-glow: rgba(50, 214, 159, 0.3);
+        --neon-green-soft: rgba(50, 214, 159, 0.2);
+        --accent-hover: #1a1a1a;
+        --error-red: #ff4c4c;
+        --white-alpha: rgba(255, 255, 255, 0.2);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
 
     body {
         background-color: var(--bg-dark);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        color: #fff;
+        display: grid;
+        place-items: center;
         min-height: 100vh;
         margin: 0;
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        overflow: hidden;
+        font-family: 'Inter', system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
     }
 
     .center-container {
@@ -30,53 +35,77 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        gap: 30px;
+        padding: 20px;
+        width: 100%;
     }
 
     .glow-text {
-        font-size: 64px;
-        font-weight: bold;
+        font-size: clamp(32px, 8vw, 64px);
+        font-weight: 760;
         color: var(--neon-green);
-        text-shadow: 0 0 10px rgba(50, 214, 159, 0.5), 0 0 20px rgba(50, 214, 159, 0.3);
-        margin-bottom: 50px;
+        text-shadow: 0 0 10px var(--neon-green-alpha), 0 0 20px var(--neon-green-glow);
+        margin: 0;
+        letter-spacing: -0.02em;
+    }
+
+    .action-row {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .welcome-text {
+        font-size: clamp(18px, 4vw, 24px);
+        font-weight: 670;
     }
 
     .login-btn {
-        background-color: rgba(0, 0, 0, 0.6);
-        color: white;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        padding: 15px 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--bg-dark);
+        color: #fff;
+        border: 1px solid var(--white-alpha);
+        padding: 12px 30px;
         border-radius: 4px;
-        font-size: 20px;
-        font-weight: bold;
-        transition: all 0.2s ease-in-out;
+        font-size: 18px;
+        font-weight: 670;
+        transition: all 0.2s ease;
         text-decoration: none;
-        display: inline-block;
         cursor: pointer;
+        position: relative;
     }
 
     .login-btn:hover {
         background-color: var(--accent-hover);
-        border-color: rgba(255, 255, 255, 0.8);
+        border-color: var(--neon-green);
         color: var(--neon-green);
-        box-shadow: 0 0 15px rgba(50, 214, 159, 0.2);
+        box-shadow: 0 0 15px var(--neon-green-soft);
+    }
+
+    .htmx-indicator {
+        display: none;
+        margin-left: 10px;
+    }
+
+    .htmx-request .htmx-indicator {
+        display: inline-block;
+    }
+
+    .htmx-request.login-btn {
+        pointer-events: none;
+        opacity: 0.8;
+        filter: grayscale(0.5);
     }
 
     .error-msg {
         color: var(--error-red);
-        background: rgba(255, 76, 76, 0.1);
-        border: 1px solid var(--error-red);
-        padding: 10px 20px;
-        border-radius: 4px;
-        margin-bottom: 30px;
+        font-weight: 555;
         animation: fade-in 0.3s ease-out;
-    }
-
-    .user-avatar {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        border: 2px solid var(--neon-green);
-        margin-bottom: 20px;
     }
 
     @keyframes fade-in {
