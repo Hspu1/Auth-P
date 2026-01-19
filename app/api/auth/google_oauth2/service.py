@@ -64,4 +64,7 @@ async def callback_handling(request: Request) -> RedirectResponse:
         return RedirectResponse(url='/')
 
     except OAuthError as e:
+        if e.error == "mismatching_state":
+            return RedirectResponse(url="/?msg=session_expired")
+
         raise HTTPException(status_code=400, detail=f"OAuth error: {e.error}")

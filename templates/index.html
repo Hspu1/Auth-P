@@ -4,6 +4,9 @@
     {% if msg == "access_denied" %}
         <div class="error-msg">You refused authorization</div>
     {% endif %}
+    {% if msg == "session_expired" %}
+        <div class="error-msg">Your session has expired</div>
+    {% endif %}
 
     {% if user %}
         <div class="glow-text">Welcome, {{ user.name }}</div>
