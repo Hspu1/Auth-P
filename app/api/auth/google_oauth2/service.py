@@ -1,11 +1,11 @@
 from authlib.integrations.starlette_client import OAuthError
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import Request, HTTPException
 from starlette.responses import RedirectResponse
 
-from app.api.auth.google_oauth2.g_auth_config import oauth
+from app.api.auth.google_oauth2.client import oauth
 
 
-async def g_auth_callback(request: Request) -> RedirectResponse:
+async def callback_handling(request: Request) -> RedirectResponse:
     if request.query_params.get("error"):
         request.session.clear()
         return RedirectResponse(url="/?msg=access_denied")
