@@ -3,10 +3,52 @@ from datetime import datetime, timezone
 from authlib.integrations.starlette_client import OAuthError
 from fastapi import Request, HTTPException
 from starlette.responses import RedirectResponse
+from sqlalchemy import select
 
 from app.api.auth.google_oauth2.client import oauth
 from app.core import UsersModel, UserIdentitiesModel
 from app.core.db.database import async_session_maker
+
+
+async def get_identity(session, provider: str, provider_user_id: str):
+    stmt = select(UserIdentitiesModel).where(
+        UserIdentitiesModel.provider == provider,
+        UserIdentitiesModel.provider_user_id == provider_user_id
+    )
+    return (await session.execute(stmt)).scalar_one_or_none()
+
+
+async def get_email(session, email: str):
+    stmt = select(UsersModel).where(UsersModel.email == email)
+    return (await session.execute(stmt)).scalar_one_or_none()
+
+
+async def get_user_id(user_info: dict):
+    async with async_session_maker() as session:
+        async with session.begin():
+            identity = await get_identity(session, "google", user_info["sub"])
+            if identity:
+                return str(identity.user_id)
+
+            user = await get_email(session, user_info["email"])
+            email_verification = datetime.now(timezone.utc) if user_info.get("email_verified", False) else None
+            if not user:
+                user = UsersModel(
+                    email=user_info["email"], full_name=user_info["name"],
+                    email_verification_at=email_verification
+                )
+                session.add(user)
+                await session.flush()
+            else:
+                if not user.email_verification_at and email_verification:
+                    user.email_verification_at = email_verification
+
+            new_identity = UserIdentitiesModel(
+                user_id=user.id, provider="google",  # wb special class with constants (providers)
+                provider_user_id=user_info["sub"]
+            )
+            session.add(new_identity)
+            return str(user.id)
 
 
 async def callback_handling(request: Request) -> RedirectResponse:
@@ -18,30 +60,8 @@ async def callback_handling(request: Request) -> RedirectResponse:
         token = await oauth.google.authorize_access_token(request)
         user_info = token.get("userinfo")
         if user_info:
-            # передавай только id (UUID v7) из базы
-            request.session[''] = {}
+            request.session['user_id'] = await get_user_id(user_info=user_info)
         return RedirectResponse(url='/')
 
     except OAuthError as e:
         raise HTTPException(status_code=400, detail=f"OAuth error: {e.error}")
-
-
-async def brainstorm_the_name_later(request: Request):
-    token = await oauth.google.authorize_access_token(request)
-    user_info = token.get("userinfo")
-
-    async with (async_session_maker() as session):
-        async with session.begin():
-            current_time, is_verified = (
-                datetime.now(timezone.utc), user_info.get("email_verified", False)
-            )
-
-            new_user = UsersModel(
-                email=user_info.get("email"), full_name=user_info.get("name"),
-                email_verification_at=current_time if is_verified else None
-            )
-            new_user_identity = UserIdentitiesModel(
-                provider="Google", provider_user_id=user_info.get("sub")
-            )
-
-            session.add(new_user, new_user_identity)

@@ -1,8 +1,5 @@
-import asyncio
-
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
 
 from app.core.templates import templates
 

@@ -16,7 +16,7 @@ class UsersModel(Base, TimestampMixin, UUIDv7Mixin):
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     email_verification_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=None, server_default=None)
     full_name: Mapped[str] = mapped_column(String(255), nullable=False)
-    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, server_default="true")
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, server_default="true")  # ban etc
     identities: Mapped[list["UserIdentitiesModel"]] = relationship("UserIdentitiesModel", back_populates="user", cascade="all, delete-orphan")
 
     __table_args__ = (
@@ -30,6 +30,7 @@ class UserIdentitiesModel(Base, UUIDv7Mixin):
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     provider: Mapped[str] = mapped_column(String(50), nullable=False)
     provider_user_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    # provider_user_id - sub/email/nickname/number etc
     password_hash: Mapped[str | None] = mapped_column(String(1024), nullable=True)
     user: Mapped["UsersModel"] = relationship("UsersModel", back_populates="identities")
 
