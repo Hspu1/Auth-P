@@ -1,7 +1,9 @@
+import os
+
 from authlib.integrations.starlette_client import OAuth
 
-from app.env_config import stg
-
+from app.core.env_config import stg
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 oauth = OAuth()
 oauth.register(
@@ -10,6 +12,7 @@ oauth.register(
     client_secret=stg.client_secret,
     server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
     client_kwargs={
-        'scope': 'openid email profile'
+        'scope': 'openid email profile',
+        'prompt': 'select_account'
     }
 )

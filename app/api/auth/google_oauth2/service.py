@@ -52,20 +52,24 @@ async def get_user_id(user_info: dict):
 
 
 async def callback_handling(request: Request) -> RedirectResponse:
+    print("DEBUG: Callback started")  # Увидишь в консоли
     if request.query_params.get("error"):
-        request.session.clear()
         return RedirectResponse(url="/?msg=access_denied")
 
     try:
+        # Здесь часто происходит зависание, если redirect_uri не совпадает до символа
         token = await oauth.google.authorize_access_token(request)
+        print("DEBUG: Token received")
+
         user_info = token.get("userinfo")
         if user_info:
-            request.session['user_id'] = await get_user_id(user_info=user_info)
+            user_id = await get_user_id(user_info=user_info)
+            request.session['user_id'] = user_id
             request.session['full_name'] = user_info["name"]
+            print(f"DEBUG: User logged in: {user_id}")
+
         return RedirectResponse(url='/')
 
     except OAuthError as e:
-        if e.error == "mismatching_state":
-            return RedirectResponse(url="/?msg=session_expired")
-
-        raise HTTPException(status_code=400, detail=f"OAuth error: {e.error}")
+        print(f"DEBUG: OAuthError: {e.error}")
+        return RedirectResponse(url="/?msg=session_expired")
