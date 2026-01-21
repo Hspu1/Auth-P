@@ -16,3 +16,4 @@ class Settings(BaseSettings):
 
 
 stg = Settings()
+# фикс родаков тут + пост на логауте с 303
