@@ -1,20 +1,24 @@
 import os
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-from fastapi import FastAPI
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
+
+from fastapi import FastAPI, Request
 from fastapi.responses import ORJSONResponse
 from fastapi.openapi.docs import (
-    get_redoc_html,
-    get_swagger_ui_html,
+    get_redoc_html, get_swagger_ui_html,
     get_swagger_ui_oauth2_redirect_html,
 )
+from fastapi_csrf_protect.exceptions import CsrfProtectError
+from fastapi.responses import JSONResponse
 from uvicorn import run
 from starlette.middleware.sessions import SessionMiddleware
-from starlette.middleware.trustedhost import TrustedHostMiddleware
+from starlette_csrf import CSRFMiddleware
 
 from app.frontend.homepage import homepage_router
 from app.api.auth.google_oauth2 import google_oauth2_router
-from app.env_config import stg
+from app.core.env_config import stg
+import app.core.csrf_config
 
 
 def static_docs_urls(app: FastAPI):
@@ -56,12 +60,8 @@ def create_app(testing: bool = False) -> FastAPI:
 
     static_docs_urls(app=app)
     # wb FastAPI CSRF Protect XSS Security Headers Session Security idk
-    app.add_middleware(
-        SessionMiddleware, secret_key=stg.session_secret_key,
-        https_only=False, same_site="lax")
-    app.add_middleware(TrustedHostMiddleware,
-                       allowed_hosts=["127.0.0.1", "localhost",
-                                      "*.google.com"])
+    app.add_middleware(SessionMiddleware, secret_key=stg.session_secret_key,
+                       same_site="lax")
     app.include_router(google_oauth2_router)
     app.include_router(homepage_router)
 
@@ -70,19 +70,17 @@ def create_app(testing: bool = False) -> FastAPI:
 
 app = create_app()
 
+
+@app.exception_handler(CsrfProtectError)
+def csrf_protect_exception_handler(request: Request, exc: CsrfProtectError):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.message}
+    )
+
+
 if __name__ == "__main__":
     run(
         app="app.main:app", port=8000,
-        host="localhost", reload=False, use_colors=True,
-        ssl_keyfile=r"C:\Users\Макс\Auth-P\localhost+1-key.pem",
-        ssl_certfile=r"C:\Users\Макс\Auth-P\localhost+1.pem"
+        host="127.0.0.1", reload=False, use_colors=True
     )
-# local https:
-# install mkcret (eg choco install mkcert)
-# mkcert -install
-# cd <path 2da proj>
-# mkcert localhost 127.0.0.1
-# uvicorn.run:
-# ssl_keyfile=r"<path 2da proj>localhost+1-key.pem",
-# ssl_certfile=r"<path 2da proj>localhost+1.pem"
-# well done

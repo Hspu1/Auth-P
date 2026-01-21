@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine, async_sessionmaker, AsyncSession
 )
 
-from app.env_config import stg
+from app.core.env_config import stg
 # wb DI (Dishka??)
 
 engine = create_async_engine(

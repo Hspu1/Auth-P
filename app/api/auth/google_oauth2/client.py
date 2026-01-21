@@ -1,7 +1,9 @@
+import os
+
 from authlib.integrations.starlette_client import OAuth
 
-from app.env_config import stg
-
+from app.core.env_config import stg
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 oauth = OAuth()
 oauth.register(
